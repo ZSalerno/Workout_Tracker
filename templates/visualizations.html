@@ -13,21 +13,39 @@
     <!--Commented out for time being. Need to pass flask input to this js file somehow if i want to use it-->
     <!--<script src="{{url_for('static', filename='chart_scripts.js')}}"></script>-->
   <script>
+
+  <!--Create Year Per Day Chart-->
+
+  <!--Get colors for bars. Necessary because # of bars is dynamic.-->
+      barColors = [];
+      for (var i = 0; i < {{ dpl }}.length; i++) {
+        barColors[i] = themeColors[i]
+      }
       var daysYearctx = document.getElementById("daysPerYearChart");
       var daysPerYearChart = new Chart(daysYearctx, {
         type: 'bar',
+        backgroundColor: ["#e8a668"],
         data: {
             labels: [
                 {% for l in dpl %}"{{ l }}",{% endfor %}
             ],
             datasets: [{
                 label: 'Days Exercised Per Year',
+                backgroundColor: barColors,
+                borderColor: barColors,
                 data: [
                     {% for v in dpv %}"{{ v }}",{% endfor %}
                 ],
             }]
         },
         options: {
+            title: {
+                display: true,
+                text: 'Days Exercised Per Year',
+            },
+            legend: {
+                display: false
+            },
             scales: {
                 yAxes: [{
                     ticks: {
@@ -38,20 +56,20 @@
         }
       });
 
-<!--This is giving me the dictionary. I need to loop through it, though.Also need to figure out if I can skip the months I didnt work out for some of these-->
-      <!--x = {{ dictionary_test|safe }}['2017']-->
-      <!--alert(x[0])-->
-
-    <!--This gets the year values. Iterate through to get all.-->
-      <!--key = Object.keys({{ dictionary_test|safe }})[0];-->
-      <!--alert(key)-->
-
-      <!--This gets the lists tied to the key values. Iterate-->
-      <!--listOfLists = {{ dictionary_test|safe }}[key]-->
-
-        <!--Gets list within list of lists. Iterate-->
-        <!--lst = listOfLists[0]-->
-
+      <!--Create dataset based on data pased from flask-->
+      var i;
+      var dataPoints = {{ dpm_dict|safe }}
+      var years = Object.keys({{ dpm_dict|safe }});
+      datasetData = [];
+      for (var i = 0; i < Object.keys(dataPoints).length; i++){
+        datasetData[i] = {
+            label: 'Days Exercised Per Month in DataYear'.replace('DataYear', years[i]),
+            fill: false,
+            backgroundColor: themeColors[i],
+            borderColor: themeColors[i],
+            data: dataPoints[years[i]]
+        }
+      }
 
       var daysMonthctx = document.getElementById("daysPerMonthChart");
       var daysPerMonthChart = new Chart(daysMonthctx, {
@@ -59,46 +77,7 @@
         data: {
             labels: ["January", "February", "March", "April", "May", "June", "July",
                     "August", "September", "October", "November", "December"],
-            datasets: [{
-                label: 'Days Exercised Per Month 2017',
-                fill: false,
-                backgroundColor: '#ff0000',
-                borderColor: '#ff0000',
-                data: [{
-                   x: "July",
-                   y: 5
-                }, {
-                    x: "August",
-                    y: 5
-                }],
-            },{
-                label: 'Days Exercised Per Month 2018',
-                fill: false,
-                backgroundColor: '#0000ff',
-                borderColor: '#0000ff',
-                data: [{
-                   x: "January",
-                   y: 19
-                }, {
-                    x: "February",
-                    y: 16
-                }, {
-                    x: "March",
-                    y: 19
-                }, {
-                    x: "April",
-                    y: 13
-                }],
-            },{
-                label: 'Days Exercised Per Month 2019',
-                fill: false,
-                backgroundColor: '#33cc33',
-                borderColor: '#33cc33',
-                data: [{
-                   x: "January",
-                   y: 12
-                }]
-            }]
+            datasets: datasetData
         },
         options: {
             responsive: true,
