@@ -1,3 +1,31 @@
+//Chart theme
+var themeColors = [
+    "#1d1145",
+    "#0db4b9",
+    "#f2a1a1",
+    "#e76d89",
+    "#e8a668",
+    "#cf5d3a",
+    "#773f3f",
+    "#4f7b8a",
+    "#45a5aa",
+];
+
+var transparentThemeColors = [
+    "#1d114566",
+    "#0db4b966",
+    "#f2a1a166",
+    "#e76d8966",
+    "#e8a66866",
+    "#cf5d3a66",
+    "#773f3f66",
+    "#4f7b8a66",
+    "#45a5aa66",
+];
+
+function getThemeColor(i) {
+    return themeColors[i];
+}
 
 // Get html from the last row of table and append it in a new row. Not taking values of inputs
 function addRow() {
