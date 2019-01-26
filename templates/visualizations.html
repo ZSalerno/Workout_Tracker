@@ -8,6 +8,7 @@
     <h1>Visualizations</h1>
     <canvas id="daysPerYearChart" width="400" height="200"></canvas>
     <canvas id="daysPerMonthChart" width="400" height="200"></canvas>
+    <canvas id="liftsOverTimeChart" width="400" height="300"></canvas>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 
     <!--Commented out for time being. Need to pass flask input to this js file somehow if i want to use it-->
@@ -24,7 +25,6 @@
       var daysYearctx = document.getElementById("daysPerYearChart");
       var daysPerYearChart = new Chart(daysYearctx, {
         type: 'bar',
-        backgroundColor: ["#e8a668"],
         data: {
             labels: [
                 {% for l in dpl %}"{{ l }}",{% endfor %}
@@ -60,7 +60,7 @@
       var i;
       var dataPoints = {{ dpm_dict|safe }}
       var years = Object.keys({{ dpm_dict|safe }});
-      datasetData = [];
+      var datasetData = [];
       for (var i = 0; i < Object.keys(dataPoints).length; i++){
         datasetData[i] = {
             label: 'Days Exercised Per Month in DataYear'.replace('DataYear', years[i]),
@@ -71,6 +71,7 @@
         }
       }
 
+      <!--Create datys per month chart-->
       var daysMonthctx = document.getElementById("daysPerMonthChart");
       var daysPerMonthChart = new Chart(daysMonthctx, {
         type: 'line',
@@ -86,6 +87,24 @@
                 text: 'Days Exercised per Month'
             },
         }
+      });
+
+      <!--Create lifts over time chart-->
+      var liftsOverTimectx = document.getElementById("liftsOverTimeChart");
+      var liftsOverTimeChart = new Chart(liftsOverTimectx, {
+        type: 'line',
+        data: {
+            labels: {{ dates|safe }},
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        },
       });
   </script>
   </body>

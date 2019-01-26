@@ -1,6 +1,7 @@
 import pandas
 import datetime
 import json
+import numpy
 
 from flask import Flask, render_template, request
 from sqlalchemy import create_engine, Table, MetaData
@@ -139,10 +140,10 @@ def saveExercise():
 
 @app.route('/visualizations')
 def visualizations():
+
+    ##### DAYS PER YEAR
     days_per_year_df = pandas.read_sql(_DAYS_PER_YEAR_SQL, engine, )
     days_per_list = days_per_year_df.values.tolist()
-
-    days_per_month_df = pandas.read_sql(_DAYS_PER_MONTH_SQL, engine, )
 
     days_per_labels = []
     days_per_values = []
@@ -150,13 +151,26 @@ def visualizations():
         days_per_labels.append(year[0])
         days_per_values.append(year[1])
 
+    ##### DAYS PER MONTH
     # Dictionary with list of dictionaries for month,days for each year in DB
+    days_per_month_df = pandas.read_sql(_DAYS_PER_MONTH_SQL, engine, )
     dict = {}
     for year in days_per_month_df['Year'].unique():
         dict[year] = [{"x":days_per_month_df['Month'][day], "y":days_per_month_df['Days'][day]} for day in days_per_month_df[days_per_month_df['Year']==year].index]
+
+    ##### LIFTS OVER TIME
+    history_df = pandas.read_sql(_HISTORY_SQL, engine, )
+    # Lots of work to get from datetime objects to unique list of date strings
+    dates = history_df.Date.unique()
+    dates = numpy.sort(dates).tolist()
+    for i, date in enumerate(dates):
+        dates[i] = dates[i].strftime('%m/%d/%Y')
+
+    # Have date labels. Need to provide datasets now
 
     return render_template('visualizations.html',
                             dpl=days_per_labels,
                             dpv=days_per_values,
                             dpm_dict=dict,
+                            dates = dates,
                            )

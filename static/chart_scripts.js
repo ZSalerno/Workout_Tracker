@@ -20,33 +20,58 @@ var daysPerYearChart = new Chart(daysYearctx, {
 });
 
 
-<!--var daysMonthctx = document.getElementById("daysPerMonthChart");-->
-<!--var daysPerMonthChart = new Chart(daysMonthctx, {-->
-<!--type: 'line',-->
-<!--data: {-->
-    <!--labels: [1, 2, 3, 4, 5, 6, ,7 8, 9, 10, 11, 12],-->
-    <!--datasets: [{-->
-        <!--label: 'Days Exercised Per Month 2017',-->
-        <!--data: [-->
-            <!--{% for v in dpv %}"{{ v }}",{% endfor %}-->
-        <!--],-->
-    <!--},{-->
-        <!--label: 'Days Exercised Per Month 2018',-->
-        <!--data: [-->
-        <!--],-->
-    <!--},{-->
-        <!--label: 'Days Exercised Per Month 2019',-->
-        <!--data : [-->
-        <!--],-->
-    <!--}]-->
-<!--},-->
-<!--options: {-->
-    <!--scales: {-->
-        <!--yAxes: [{-->
-            <!--ticks: {-->
-                <!--beginAtZero:true-->
-            <!--}-->
-        <!--}]-->
-    <!--}-->
-<!--}-->
-<!--});-->
+
+var daysPerMonthChart = new Chart(daysMonthctx, {
+type: 'line',
+data: {
+    labels: ["January", "February", "March", "April", "May", "June", "July",
+            "August", "September", "October", "November", "December"],
+    datasets: [{
+        label: 'Days Exercised Per Month 2017',
+        fill: false,
+        backgroundColor: getThemeColor(0),
+        borderColor: getThemeColor(0),
+        data: [{
+           x: "July",
+           y: 5
+        }, {
+            x: "August",
+            y: 5
+        }],
+    },{
+        label: 'Days Exercised Per Month 2018',
+        fill: false,
+        backgroundColor: getThemeColor(1),
+        borderColor: getThemeColor(1),
+        data: [{
+           x: "January",
+           y: 19
+        }, {
+            x: "February",
+            y: 16
+        }, {
+            x: "March",
+            y: 19
+        }, {
+            x: "April",
+            y: 13
+        }],
+    },{
+        label: 'Days Exercised Per Month 2019',
+        fill: false,
+        backgroundColor: getThemeColor(2),
+        borderColor: getThemeColor(2),
+        data: [{
+           x: "January",
+           y: 12
+        }]
+    }]
+},
+options: {
+    responsive: true,
+    title: {
+        display: true,
+        text: 'Days Exercised per Month'
+    },
+}
+});
