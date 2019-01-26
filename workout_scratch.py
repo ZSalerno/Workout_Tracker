@@ -22,8 +22,24 @@ _LIFT_SQL = '''
     SELECT ID, Lift_Name 
     FROM Lift
 '''
+_DAYS_PER_YEAR_SQL = '''
+SELECT YEAR(Date) AS 'Year', COUNT(*) AS 'Days'
+FROM (
+    SELECT DISTINCT Date
+    FROM Exercise
+) AS a
+GROUP BY YEAR(Date)
+'''
+_DAYS_PER_MONTH_SQL = '''
+SELECT YEAR(Date) AS 'Year', MONTH(Date) AS 'Month', count(*) AS 'Days'
+FROM (
+    SELECT DISTINCT Date
+    FROM Exercise
+) AS a
+GROUP BY YEAR(Date), MONTH(Date)
+ORDER BY YEAR(DATE), MONTH(Date)
 
-
+'''
 app = Flask(__name__)
 
 
@@ -50,8 +66,8 @@ def base():
 def workouts():
 
     # Get data for historical view and select list
-    history_df = pandas.read_sql(_HISTORY_SQL, engine, )
-    lift_df = pandas.read_sql(_LIFT_SQL, engine, )
+    history_df = pandas.read_sql(_HISTORY_SQL, engine,)
+    lift_df = pandas.read_sql(_LIFT_SQL, engine,)
 
     # Creates historical table
     html = history_df.to_html(
@@ -123,4 +139,67 @@ def saveExercise():
 
 @app.route('/visualizations')
 def visualizations():
-    return render_template('visualizations.html')
+    days_per_year_df = pandas.read_sql(_DAYS_PER_YEAR_SQL, engine, )
+    days_per_list = days_per_year_df.values.tolist()
+
+    days_per_month_df = pandas.read_sql(_DAYS_PER_MONTH_SQL, engine, )
+    days_per_month_list = days_per_month_df.values.tolist()
+
+    days_per_labels = []
+    days_per_values = []
+    for year in days_per_list:
+        days_per_labels.append(year[0])
+        days_per_values.append(year[1])
+
+    print(days_per_month_df)
+
+    # Dictionary with list of lists for month,days for each year in DB
+    dict = {}
+    for year in days_per_month_df['Year'].unique():
+        dict[year] = [[days_per_month_df['Month'][day], days_per_month_df['Days'][day]] for day in days_per_month_df[days_per_month_df['Year']==year].index]
+    print(dict)
+
+
+    # Generate this for all years in return value
+    # label: 'Days Exercised Per Month 2017',
+    # data: [
+    #     { % for v in dpv %}"{{ v }}", { % endfor %}
+    # ]
+
+    return render_template('visualizations.html',
+                           dpl=days_per_labels,
+                           dpv=days_per_values,
+                           dictionary_test=dict,
+                           )
+
+# Is this going to work or should I send this to javascript and figure out a way to loop there? This seems
+# overly complicated
+
+# What I need in javascript - for every year in dictionary - create datapoint. Might look the same?
+#     data: dataFunction()
+#     And then the function would create strings? Or just have each list....
+#     You'd need the dictionary. Access the year for the first sentence. then the data based on the lists >>
+
+    #{% for item in dict %} ,{
+        # label: 'Days Exercised Per Month in {{ item.year }},
+        # data: [
+        #     {% for months in item.list %}"x: {{ months }}", y: {{ days }}, { % endfor %}
+        # ],
+#         }
+#   {% endfor %} ],
+
+    # data: [{
+    #     x: 10, - month
+    #     y: 20 - days
+    # }, {
+    #     x: 15,
+    #     y: 10
+    # }]
+
+
+# def create_data(dict):
+#     data_point=''
+#
+#     lbl = "label: 'Days Exercised Per Month {}"
+#     data = "data: "
+#     return data_point

@@ -4,11 +4,111 @@
 
 {% block content %}
 <html>
-  <head>
-
-  </head>
   <body>
-      <a href="javascript://" onclick="Sijax.request('say_hi');">Click here</a>
+    <h1>Visualizations</h1>
+    <canvas id="daysPerYearChart" width="400" height="200"></canvas>
+    <canvas id="daysPerMonthChart" width="400" height="200"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+
+    <!--Commented out for time being. Need to pass flask input to this js file somehow if i want to use it-->
+    <!--<script src="{{url_for('static', filename='chart_scripts.js')}}"></script>-->
+  <script>
+      var daysYearctx = document.getElementById("daysPerYearChart");
+      var daysPerYearChart = new Chart(daysYearctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for l in dpl %}"{{ l }}",{% endfor %}
+            ],
+            datasets: [{
+                label: 'Days Exercised Per Year',
+                data: [
+                    {% for v in dpv %}"{{ v }}",{% endfor %}
+                ],
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+      });
+
+<!--This is giving me the dictionary. I need to loop through it, though.Also need to figure out if I can skip the months I didnt work out for some of these-->
+      <!--x = {{ dictionary_test|safe }}['2017']-->
+      <!--alert(x[0])-->
+
+    <!--This gets the year values. Iterate through to get all.-->
+      <!--key = Object.keys({{ dictionary_test|safe }})[0];-->
+      <!--alert(key)-->
+
+      <!--This gets the lists tied to the key values. Iterate-->
+      <!--listOfLists = {{ dictionary_test|safe }}[key]-->
+
+        <!--Gets list within list of lists. Iterate-->
+        <!--lst = listOfLists[0]-->
+
+
+      var daysMonthctx = document.getElementById("daysPerMonthChart");
+      var daysPerMonthChart = new Chart(daysMonthctx, {
+        type: 'line',
+        data: {
+            labels: ["January", "February", "March", "April", "May", "June", "July",
+                    "August", "September", "October", "November", "December"],
+            datasets: [{
+                label: 'Days Exercised Per Month 2017',
+                fill: false,
+                backgroundColor: '#ff0000',
+                borderColor: '#ff0000',
+                data: [{
+                   x: "July",
+                   y: 5
+                }, {
+                    x: "August",
+                    y: 5
+                }],
+            },{
+                label: 'Days Exercised Per Month 2018',
+                fill: false,
+                backgroundColor: '#0000ff',
+                borderColor: '#0000ff',
+                data: [{
+                   x: "January",
+                   y: 19
+                }, {
+                    x: "February",
+                    y: 16
+                }, {
+                    x: "March",
+                    y: 19
+                }, {
+                    x: "April",
+                    y: 13
+                }],
+            },{
+                label: 'Days Exercised Per Month 2019',
+                fill: false,
+                backgroundColor: '#33cc33',
+                borderColor: '#33cc33',
+                data: [{
+                   x: "January",
+                   y: 12
+                }]
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Days Exercised per Month'
+            },
+        }
+      });
+  </script>
   </body>
 </html>
 {% endblock %}
