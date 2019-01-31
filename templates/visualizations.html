@@ -90,20 +90,53 @@
       });
 
       <!--Create lifts over time chart-->
+      <!--var dates = {{ dates|safe }}-->
+      <!--alert(dates[0])-->
+      <!--for(var i = 0; i <dates.length; i++) {-->
+        <!--dates[i] = new Date(dates[i])-->
+      <!--}-->
+      <!--var testDate = new Date('05/10/2018')-->
+
+      <!--Need function for this-->
+      var liftData = {{ lot_dict|safe }}
+      var lifts = Object.keys({{ lot_dict|safe }});
+      datasetData = [];
+      for (var i = 0; i < Object.keys(liftData).length; i++){
+        datasetData[i] = {
+            label: lifts[i],
+            fill: false,
+            lineTension: 0,
+            <!--backgroundColor: themeColors[i],-->
+            <!--borderColor: themeColors[i],-->
+            data: liftData[lifts[i]]
+        }
+      }
+
+      <!--Works by using the max ticks value. Need to create datasets variable. Need to send DF from flask-->
+      <!--var test = {{ lot_dict|safe }}-->
       var liftsOverTimectx = document.getElementById("liftsOverTimeChart");
       var liftsOverTimeChart = new Chart(liftsOverTimectx, {
         type: 'line',
         data: {
             labels: {{ dates|safe }},
+            datasets: datasetData,
         },
         options: {
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero:true
+                        beginAtZero:true,
+                    }
+                }],
+                xAxes:[{
+                    ticks: {
+                        maxTicksLimit:10
                     }
                 }]
-            }
+            },
+            legend: {
+                display: false
+            },
         },
       });
   </script>
