@@ -2,13 +2,12 @@ import pandas
 import datetime
 import json
 import numpy
-import math
 
 from flask import Flask, render_template, request
-from sqlalchemy import create_engine, Table, MetaData
+from sqlalchemy import create_engine, Table, MetaData, text
 
 _ENGINE = "mysql+mysqldb://python_user:PythonConn149147@localhost/workout_db"
-_HISTORY_SQL = '''
+_HISTORY_SQL = text('''
     SELECT e.Date
             , l.Lift_Name AS 'Lift'
             , l.Body_Part AS 'Body Part'
@@ -19,29 +18,38 @@ _HISTORY_SQL = '''
     JOIN workout_db.lift l on l.id = e.lift_id
     JOIN workout_db.sets s on s.exercise_id = e.id
     ORDER BY e.Date desc, l.Body_Part asc, l.Lift_Name asc, s.Reps desc, s.Weight desc
-'''
-_LIFT_SQL = '''
-    SELECT ID, Lift_Name 
-    FROM Lift
-'''
-_DAYS_PER_YEAR_SQL = '''
-SELECT YEAR(Date) AS 'Year', COUNT(*) AS 'Days'
-FROM (
-    SELECT DISTINCT Date
-    FROM Exercise
-) AS a
-GROUP BY YEAR(Date)
-'''
-_DAYS_PER_MONTH_SQL = '''
-SELECT YEAR(Date) AS 'Year', MONTHNAME(Date) AS 'Month', count(*) AS 'Days'
-FROM (
-    SELECT DISTINCT Date
-    FROM Exercise
-) AS a
-GROUP BY YEAR(Date), MONTH(Date)
-ORDER BY YEAR(DATE), MONTH(Date)
+''')
 
-'''
+_HISTORY_SQL_TEST = '''SELECT e.Date, l.Lift_Name AS Lift, l.Body_Part, s.Weight, s.Sets, e.Comments 
+    FROM workout_db.exercise e JOIN workout_db.lift l on l.id = e.lift_id
+    JOIN workout_db.sets s on s.exercise_id = e.id 
+    ORDER BY e.Date desc, l.Body_Part asc, l.Lift_Name asc, s.Reps desc, s.Weight desc'''
+
+_LIFT_SQL = text('''
+    SELECT ID
+            , Lift_Name 
+    FROM Lift
+''')
+
+_DAYS_PER_YEAR_SQL = text('''
+    SELECT YEAR(Date) AS 'Year', COUNT(*) AS 'Days'
+    FROM (
+        SELECT DISTINCT Date
+        FROM Exercise
+    ) AS a
+    GROUP BY YEAR(Date)
+    ''')
+
+_DAYS_PER_MONTH_SQL = text('''
+    SELECT YEAR(Date) AS 'Year', MONTHNAME(Date) AS 'Month', count(*) AS 'Days'
+    FROM (
+        SELECT DISTINCT Date
+        FROM Exercise
+    ) AS a
+    GROUP BY YEAR(Date), MONTH(Date)
+    ORDER BY YEAR(DATE), MONTH(Date)
+''')
+
 app = Flask(__name__)
 
 
