@@ -2,6 +2,7 @@ import pandas
 import datetime
 import json
 import numpy
+import math
 
 from flask import Flask, render_template, request
 from sqlalchemy import create_engine, Table, MetaData
@@ -154,9 +155,9 @@ def visualizations():
     ##### DAYS PER MONTH
     # Dictionary with list of dictionaries for month,days for each year in DB
     days_per_month_df = pandas.read_sql(_DAYS_PER_MONTH_SQL, engine, )
-    dict = {}
+    dpm_dict = {}
     for year in days_per_month_df['Year'].unique():
-        dict[year] = [{"x":days_per_month_df['Month'][day], "y":days_per_month_df['Days'][day]} for day in days_per_month_df[days_per_month_df['Year']==year].index]
+        dpm_dict[year] = [{"x":days_per_month_df['Month'][day], "y":days_per_month_df['Days'][day]} for day in days_per_month_df[days_per_month_df['Year']==year].index]
 
     ##### LIFTS OVER TIME
     history_df = pandas.read_sql(_HISTORY_SQL, engine, )
@@ -166,11 +167,37 @@ def visualizations():
     for i, date in enumerate(dates):
         dates[i] = dates[i].strftime('%m/%d/%Y')
 
+    # Some issue with dates that arent working as datetimes
+    # history_df['Date'] = history_df['Date'].dt.strftime('%m/%d/%Y', errors='coerce')
+    # print(history_df)
+
+    lot_dict = {}
+    for lift in history_df['Lift'].unique():
+        lot_dict[lift] = [{"x":history_df['Date'][weight].strftime('%m/%d/%Y'), "y":history_df['Weight'][weight]} for weight in history_df[history_df['Lift']==lift].index]
+
+    print(lot_dict)
+    # minimized_dates = []
+    # minimized_dates.append(dates[0])
+    #
+    # jump = math.floor((len(dates)-2)/10)
+    # orig_jump = jump
+    # while jump < len(dates):
+    #     minimized_dates.append(dates[jump])
+    #     jump = jump+orig_jump
+    #
+    # if dates[-1] not in minimized_dates:
+    #     minimized_dates.append(dates[-1])
+    #
+    # print(minimized_dates)
+    # for i, date in enumerate(minimized_dates):
+    #     minimized_dates[i] = minimized_dates[i].strftime('%m/%d/%Y')
+
     # Have date labels. Need to provide datasets now
 
     return render_template('visualizations.html',
                             dpl=days_per_labels,
                             dpv=days_per_values,
-                            dpm_dict=dict,
+                            dpm_dict=dpm_dict,
                             dates = dates,
+                            lot_dict=lot_dict,
                            )
