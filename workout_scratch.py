@@ -51,7 +51,7 @@ _DAYS_PER_MONTH_SQL = text('''
 ''')
 
 app = Flask(__name__)
-
+x = ''
 
 # dtypes={
 #         'Date':'str',
