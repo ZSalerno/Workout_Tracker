@@ -9,6 +9,15 @@
     <canvas id="daysPerYearChart" width="400" height="200"></canvas>
     <canvas id="daysPerMonthChart" width="400" height="200"></canvas>
     <canvas id="liftsOverTimeChart" width="400" height="300"></canvas>
+    <div>
+      <select class="form-control" id="exLift" name="lift">
+          {% for id, lift in lifts %}
+              <option value="{{ id }}">{{ lift }}</option>
+          {% endfor %}
+      </select>
+
+      <button type="button" class="btn" onclick="loadLOTChart()">Load Chart</button>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 
     <!--Commented out for time being. Need to pass flask input to this js file somehow if i want to use it-->
@@ -56,29 +65,15 @@
         }
       });
 
-      <!--Create dataset based on data pased from flask-->
-      var i;
-      var dataPoints = {{ dpm_dict|safe }}
-      var years = Object.keys({{ dpm_dict|safe }});
-      var datasetData = [];
-      for (var i = 0; i < Object.keys(dataPoints).length; i++){
-        datasetData[i] = {
-            label: 'Days Exercised Per Month in DataYear'.replace('DataYear', years[i]),
-            fill: false,
-            backgroundColor: themeColors[i],
-            borderColor: themeColors[i],
-            data: dataPoints[years[i]]
-        }
-      }
 
-      <!--Create datys per month chart-->
+      <!--Create days per month chart-->
       var daysMonthctx = document.getElementById("daysPerMonthChart");
       var daysPerMonthChart = new Chart(daysMonthctx, {
         type: 'line',
         data: {
             labels: ["January", "February", "March", "April", "May", "June", "July",
                     "August", "September", "October", "November", "December"],
-            datasets: datasetData
+            datasets: getChartDataset({{ dpm_dict|safe }}, fill=false, colors=true)
         },
         options: {
             responsive: true,
@@ -86,59 +81,84 @@
                 display: true,
                 text: 'Days Exercised per Month'
             },
+            scales: {
+              xAxes:[{
+                type: 'category',
+              }],
+            },
         }
       });
 
       <!--Create lifts over time chart-->
-      <!--var dates = {{ dates|safe }}-->
-      <!--alert(dates[0])-->
-      <!--for(var i = 0; i <dates.length; i++) {-->
-        <!--dates[i] = new Date(dates[i])-->
-      <!--}-->
-      <!--var testDate = new Date('05/10/2018')-->
 
-      <!--Need function for this-->
-      var liftData = {{ lot_dict|safe }}
-      var lifts = Object.keys({{ lot_dict|safe }});
-      datasetData = [];
-      for (var i = 0; i < Object.keys(liftData).length; i++){
-        datasetData[i] = {
-            label: lifts[i],
-            fill: false,
-            lineTension: 0,
-            <!--backgroundColor: themeColors[i],-->
-            <!--borderColor: themeColors[i],-->
-            data: liftData[lifts[i]]
-        }
-      }
+      <!--TODO - WRONG VALUE ON CHART - last value is first date in set, works backwards from there -->
+      <!--Works by using the max ticks value. NOT MATCHING DATES CORRECTLY-->
+      function createLiftsOverTime(data, fill = false, colors = false, ctx){
+        var liftsOverTimectx = document.getElementById("liftsOverTimeChart");
+        var liftsOverTimeChart = new Chart(liftsOverTimectx, {
+          type: 'line',
+          data: {
+              labels: {{ dates|safe }},
+              datasets: getChartDataset(data, fill, colors),
+          },
+          options: {
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero:true,
+                      }
+                  }],
+                  xAxes:[{
+                      ticks: {
+                          maxTicksLimit:10
+                      },
+                      type: 'category',
+                  }]
+              },
+              legend: {
+                  display: false
+              },
+          },
+        });
 
-      <!--Works by using the max ticks value. Need to create datasets variable. Need to send DF from flask-->
-      <!--var test = {{ lot_dict|safe }}-->
+        return liftsOverTimeChart;
+      };
+
       var liftsOverTimectx = document.getElementById("liftsOverTimeChart");
-      var liftsOverTimeChart = new Chart(liftsOverTimectx, {
-        type: 'line',
-        data: {
-            labels: {{ dates|safe }},
-            datasets: datasetData,
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true,
-                    }
-                }],
-                xAxes:[{
-                    ticks: {
-                        maxTicksLimit:10
-                    }
-                }]
-            },
-            legend: {
-                display: false
-            },
-        },
-      });
+      <!--CAN THESE VARIABLES BE AUTO POPULATED? HOW TO TAKE DEFAULT ARGUMENTS?-->
+      <!--Put into variable so that the chart can be updated/deleted later on-->
+      var liftsOverTimeChart = createLiftsOverTime(data = {{ lot_dict|safe }}, fill = false, colors = false, ctx =liftsOverTimectx);
+
+      function loadLOTChart(){
+        var lift = $("#exLift option:selected").text();
+        liftsOverTimeChart.destroy();
+
+        liftsOverTimeChart = new Chart(liftsOverTimectx, {
+          type: 'line',
+          data: {
+              labels: {{ dates|safe }},
+              datasets:  getChartDatasetTEMP(data = {{ lot_dict|safe }}, key=lift, fill=false, colors=true),
+          },
+          options: {
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero:true,
+                      }
+                  }],
+                  xAxes:[{
+                      ticks: {
+                          maxTicksLimit:10
+                      },
+                      type: 'category',
+                  }]
+              },
+              legend: {
+                  display: false
+              },
+          },
+        });
+      };
   </script>
   </body>
 </html>

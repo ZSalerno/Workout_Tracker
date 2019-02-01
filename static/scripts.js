@@ -134,3 +134,52 @@ function saveRow(r){
         }
     });
 };
+
+function getChartDataset(flaskData, fill=false, colors=false){
+    var keys = Object.keys(flaskData);
+    var datasetToReturn = [];
+    for (var i = 0; i < Object.keys(flaskData).length; i++){
+        datasetToReturn[i] = {
+            label: keys[i],  //Needs to be a variable - Wrong for lifts and Month by month. Always starts at first date. Not lift or month
+            fill: fill,
+            data: flaskData[keys[i]],
+            lineTension: 0,
+        }
+        if(colors){
+            datasetToReturn[i].backgroundColor = themeColors[i];
+            datasetToReturn[i].borderColor = themeColors[i]
+        }
+    }
+
+    return datasetToReturn;
+};
+
+//TODO Need to make this the full function used in both calls in visualizations.html
+function getChartDatasetTEMP (flaskData, key, fill=false, colors=false){
+//    alert(key)
+    var datasetToReturn = [];
+
+    datasetToReturn[0] = {
+        label: key,  //Needs to be a variable
+        fill: fill,
+        data: flaskData[key],
+        lineTension: 0,
+    }
+    if(colors){
+        datasetToReturn[0].backgroundColor = themeColors[i];
+        datasetToReturn[i=0].borderColor = themeColors[i]
+    }
+
+//    alert(datasetToReturn[0])
+    return datasetToReturn;
+};
+
+function loadLOTChart(){
+    var lift = $("#exLift option:selected").text();
+
+
+
+    var data = getChartDataset(table[lift], fill=false, colors=true);
+
+
+};

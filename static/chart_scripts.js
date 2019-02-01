@@ -75,3 +75,35 @@ options: {
     },
 }
 });
+
+
+//<!--Need function for this-->
+var liftData = {{ lot_dict|safe }}
+var lifts = Object.keys({{ lot_dict|safe }});
+datasetData = [];
+for (var i = 0; i < Object.keys(liftData).length; i++){
+datasetData[i] = {
+    label: lifts[i],
+    fill: false,
+    lineTension: 0,
+    <!--backgroundColor: themeColors[i],-->
+    <!--borderColor: themeColors[i],-->
+    data: liftData[lifts[i]]
+}
+}
+
+
+<!--Create dataset based on data pased from flask-->
+var dataPoints = {{ dpm_dict|safe }} // variable for data sent from flask
+var years = Object.keys({{ dpm_dict|safe }}); //variable for keys sent from flask
+var datasetData = []; //variable for returned list
+for (var i = 0; i < Object.keys(dataPoints).length; i++){
+datasetData[i] = {
+    label: 'Days Exercised Per Month in DataYear'.replace('DataYear', years[i]),
+    fill: false,
+    backgroundColor: themeColors[i],
+    borderColor: themeColors[i],
+    data: dataPoints[years[i]]
+}
+}
+

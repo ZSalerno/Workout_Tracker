@@ -51,7 +51,6 @@ _DAYS_PER_MONTH_SQL = text('''
 ''')
 
 app = Flask(__name__)
-x = ''
 
 # dtypes={
 #         'Date':'str',
@@ -183,24 +182,11 @@ def visualizations():
     for lift in history_df['Lift'].unique():
         lot_dict[lift] = [{"x":history_df['Date'][weight].strftime('%m/%d/%Y'), "y":history_df['Weight'][weight]} for weight in history_df[history_df['Lift']==lift].index]
 
-    print(lot_dict)
-    # minimized_dates = []
-    # minimized_dates.append(dates[0])
-    #
-    # jump = math.floor((len(dates)-2)/10)
-    # orig_jump = jump
-    # while jump < len(dates):
-    #     minimized_dates.append(dates[jump])
-    #     jump = jump+orig_jump
-    #
-    # if dates[-1] not in minimized_dates:
-    #     minimized_dates.append(dates[-1])
-    #
-    # print(minimized_dates)
-    # for i, date in enumerate(minimized_dates):
-    #     minimized_dates[i] = minimized_dates[i].strftime('%m/%d/%Y')
+    # Create lifts for dropdown selection
+    lift_df = pandas.read_sql(_LIFT_SQL, engine, )
+    lift_list = lift_df.values.tolist()
 
-    # Have date labels. Need to provide datasets now
+    print(lot_dict)
 
     return render_template('visualizations.html',
                             dpl=days_per_labels,
@@ -208,4 +194,5 @@ def visualizations():
                             dpm_dict=dpm_dict,
                             dates = dates,
                             lot_dict=lot_dict,
+                            lifts=lift_list
                            )
