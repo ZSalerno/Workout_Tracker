@@ -10,13 +10,12 @@
     <canvas id="daysPerMonthChart" width="400" height="200"></canvas>
     <canvas id="liftsOverTimeChart" width="400" height="300"></canvas>
     <div>
+      <label for="exLift">Select Lift for Chart:</label>
       <select class="form-control" id="exLift" name="lift">
           {% for id, lift in lifts %}
               <option value="{{ id }}">{{ lift }}</option>
           {% endfor %}
       </select>
-
-      <button type="button" class="btn" onclick="loadLOTChart()">Load Chart</button>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 
@@ -24,6 +23,7 @@
     <!--<script src="{{url_for('static', filename='chart_scripts.js')}}"></script>-->
   <script>
 
+  <!--PUT ALL OF THIS IN A SEPARATE FILE AND LOAD HERE-->
   <!--Create Year Per Day Chart-->
 
   <!--Get colors for bars. Necessary because # of bars is dynamic.-->
@@ -51,6 +51,7 @@
             title: {
                 display: true,
                 text: 'Days Exercised Per Year',
+                fontSize: 24,
             },
             legend: {
                 display: false
@@ -79,7 +80,8 @@
             responsive: true,
             title: {
                 display: true,
-                text: 'Days Exercised per Month'
+                text: 'Days Exercised per Month',
+                fontSize: 24,
             },
             scales: {
               xAxes:[{
@@ -117,6 +119,11 @@
               },
               legend: {
                   display: false
+              },
+              title: {
+                display: true,
+                text: 'Lifts Over Time',
+                fontSize: 24,
               },
           },
         });
@@ -156,9 +163,18 @@
               legend: {
                   display: false
               },
+              title: {
+                display: true,
+                text: 'Lifts Over Time',
+                fontSize: 24,
+              },
           },
         });
       };
+
+      $( "#exLift" ).change(function() {
+        loadLOTChart();
+      });
   </script>
   </body>
 </html>
