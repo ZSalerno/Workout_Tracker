@@ -3,20 +3,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    label {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+</style>
 <html>
   <body>
     <h1>Visualizations</h1>
     <canvas id="daysPerYearChart" width="400" height="200"></canvas>
     <canvas id="daysPerMonthChart" width="400" height="200"></canvas>
     <canvas id="liftsOverTimeChart" width="400" height="300"></canvas>
-    <div>
-      <label for="exLift">Select Lift for Chart:</label>
-      <select class="form-control" id="exLift" name="lift">
+    <form class="form-inline">
+        <label for="chartLifts">Select Lift:</label>
+        <select class="form-control" id="chartLifts" name="lift">
           {% for id, lift in lifts %}
               <option value="{{ id }}">{{ lift }}</option>
           {% endfor %}
-      </select>
-    </div>
+        </select>
+        <label for="chartSets">Select Sets:</label>
+        <select class="form-control" id="chartSets">
+            
+        </select>
+        <label for="chartReps">Select Reps:</label>
+        <select class="form-control" id="chartReps">
+            
+        </select>
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 
     <!--Commented out for time being. Need to pass flask input to this js file somehow if i want to use it-->
@@ -114,7 +129,7 @@
                       ticks: {
                           maxTicksLimit:10
                       },
-                      type: 'category',
+                      type: 'time',
                   }]
               },
               legend: {
@@ -137,7 +152,7 @@
       var liftsOverTimeChart = createLiftsOverTime(data = {{ lot_dict|safe }}, fill = false, colors = false, ctx =liftsOverTimectx);
 
       function loadLOTChart(){
-        var lift = $("#exLift option:selected").text();
+        var lift = $("#chartLifts option:selected").text();
         liftsOverTimeChart.destroy();
 
         liftsOverTimeChart = new Chart(liftsOverTimectx, {
@@ -157,7 +172,7 @@
                       ticks: {
                           maxTicksLimit:10
                       },
-                      type: 'category',
+                      type: 'time',
                   }]
               },
               legend: {
@@ -172,7 +187,7 @@
         });
       };
 
-      $( "#exLift" ).change(function() {
+      $( "#chartLifts" ).change(function() {
         loadLOTChart();
       });
   </script>

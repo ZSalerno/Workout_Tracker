@@ -156,7 +156,6 @@ function getChartDataset(flaskData, fill=false, colors=false){
 
 //TODO Need to make this the full function used in both calls in visualizations.html
 function getChartDatasetTEMP (flaskData, key, fill=false, colors=false){
-//    alert(key)
     var datasetToReturn = [];
 
     datasetToReturn[0] = {
@@ -170,12 +169,11 @@ function getChartDatasetTEMP (flaskData, key, fill=false, colors=false){
         datasetToReturn[i=0].borderColor = themeColors[i]
     }
 
-//    alert(datasetToReturn[0])
     return datasetToReturn;
 };
 
 function loadLOTChart(){
-    var lift = $("#exLift option:selected").text();
+    var lift = $("#chartLifts option:selected").text();
 
 
 
