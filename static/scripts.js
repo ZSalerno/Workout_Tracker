@@ -171,13 +171,3 @@ function getChartDatasetTEMP (flaskData, key, fill=false, colors=false){
 
     return datasetToReturn;
 };
-
-function loadLOTChart(){
-    var lift = $("#chartLifts option:selected").text();
-
-
-
-    var data = getChartDataset(table[lift], fill=false, colors=true);
-
-
-};

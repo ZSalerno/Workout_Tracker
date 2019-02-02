@@ -2,6 +2,7 @@ import pandas
 import datetime
 import json
 import numpy
+import pprint
 
 from flask import Flask, render_template, request
 from sqlalchemy import create_engine, Table, MetaData, text
@@ -179,20 +180,60 @@ def visualizations():
     # print(history_df)
 
     lot_dict = {}
+    sets_reps_dict = {}
     for lift in history_df['Lift'].unique():
-        lot_dict[lift] = [{"x":history_df['Date'][weight].strftime('%m/%d/%Y'), "y":history_df['Weight'][weight]} for weight in history_df[history_df['Lift']==lift].index]
+        lot_dict[lift] = [
+            {"x":history_df['Date'][weight].strftime('%m/%d/%Y'), "y":history_df['Weight'][weight]}
+                for weight in history_df[history_df['Lift'] == lift].index
+        ]
+
 
     # Create lifts for dropdown selection
     lift_df = pandas.read_sql(_LIFT_SQL, engine, )
     lift_list = lift_df.values.tolist()
 
-    print(lot_dict)
+    history_df = history_df.drop(columns=['Body Part', 'Comments'])
+
+    # Group by contains objects with DFs grouped by below fields
+    grouped_lifts_sets =  history_df.groupby(['Lift', 'Sets & Reps'])
+
+    # Looping through to create dictionary to send to the front end
+    for key, item in grouped_lifts_sets:
+        # key = lift and every set rep combo
+        # item = data for each group
+
+        df = grouped_lifts_sets.get_group(key)
+        lift = df.iloc[0]['Lift']
+
+        for sets in df['Sets & Reps'].unique():
+            # If lift already exists in dictionary, need to append new value so that existing isn't overwritten
+            if lift in sets_reps_dict:
+                sets_reps_dict[lift].append({
+                    sets: [{"x": df['Date'][weight].strftime('%m/%d/%Y'), "y": history_df['Weight'][weight]}
+                           for weight in df[df['Sets & Reps'] == sets].index]
+                    })
+            else:
+                sets_reps_dict[lift] = [{
+                    sets:[{"x": df['Date'][weight].strftime('%m/%d/%Y'), "y": history_df['Weight'][weight]}
+                                  for weight in df[df['Sets & Reps'] == sets].index]
+                }]
+
+    # pprint.pprint(sets_reps_dict['Ab Circuit'])
+
+    # Get dropdown values for LOT sets&reps select list
+    sets_reps_dropdown_dict = {}
+    for lift in lift_list:
+        sets_reps_dropdown_dict[lift[1]] = [] #sets_reps_dict[lift[1]]
+        for dict in sets_reps_dict[lift[1]]:
+            sets_reps_dropdown_dict[lift[1]].append(list(dict.keys())[0])
 
     return render_template('visualizations.html',
-                            dpl=days_per_labels,
-                            dpv=days_per_values,
-                            dpm_dict=dpm_dict,
-                            dates = dates,
-                            lot_dict=lot_dict,
-                            lifts=lift_list
+                                dpl=days_per_labels,
+                                dpv=days_per_values,
+                                dpm_dict=dpm_dict,
+                                dates = dates,
+                                lot_dict=lot_dict,
+                                lifts=lift_list,
+                                sets_reps_dict = sets_reps_dict,
+                                sets_dropdown = sets_reps_dropdown_dict,
                            )

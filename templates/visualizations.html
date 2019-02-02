@@ -22,17 +22,12 @@
               <option value="{{ id }}">{{ lift }}</option>
           {% endfor %}
         </select>
-        <label for="chartSets">Select Sets:</label>
-        <select class="form-control" id="chartSets">
-            
-        </select>
-        <label for="chartReps">Select Reps:</label>
-        <select class="form-control" id="chartReps">
-            
-        </select>
+        <label for="chartSets">Select Sets and Reps:</label>
+        <select class="form-control" id="chartSets"></select>
     </form>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+    <script src="{{url_for('static', filename='chart_scripts.js')}}"></script>
 
     <!--Commented out for time being. Need to pass flask input to this js file somehow if i want to use it-->
     <!--<script src="{{url_for('static', filename='chart_scripts.js')}}"></script>-->
@@ -151,6 +146,8 @@
       <!--Put into variable so that the chart can be updated/deleted later on-->
       var liftsOverTimeChart = createLiftsOverTime(data = {{ lot_dict|safe }}, fill = false, colors = false, ctx =liftsOverTimectx);
 
+      var chartSetData = {{ sets_dropdown |safe }};
+
       function loadLOTChart(){
         var lift = $("#chartLifts option:selected").text();
         liftsOverTimeChart.destroy();
@@ -185,10 +182,30 @@
               },
           },
         });
+        $("#chartSets").empty()
+        var chartSetDataForLift = chartSetData[lift]
+        for(var i = 0; i < chartSetDataForLift.length; i++){
+            $("#chartSets").append('<option value="'+ i +'">' + chartSetDataForLift[i] + '</option>');
+        }
       };
 
-      $( "#chartLifts" ).change(function() {
+      $("#chartLifts").change(function() {
         loadLOTChart();
+      });
+
+      $("#chartSets").change(function() {
+        var lift = $("#chartLifts option:selected").text();
+        var key = $("#chartSets option:selected").text();
+        var index = $("#chartSets option:selected").val();
+
+        var data = {{ sets_reps_dict | safe }}[lift]
+
+        liftsOverTimeChart = loadSetsLOTChart(
+            labels = {{ dates | safe}},
+            data = {{ sets_reps_dict | safe }}[lift][index],
+            key,
+            liftsOverTimeChart
+        );
       });
   </script>
   </body>
