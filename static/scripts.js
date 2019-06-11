@@ -77,7 +77,7 @@ function copyRow(r){
         this.id = newId
 
         // Check if current ID belongs to the list of elements that should be disabled
-        nameCheck = contains(newId, words);
+        nameCheck = contains(newId.toLowerCase(), words);
         if (nameCheck) {
             ids.push('#'+newId)
         }

@@ -141,7 +141,6 @@ def saveExercise():
 
     # Need to check if row exists already before saving
     # Need to do a freeze on the row while ajax saves - have gif saved. need div on top of table that shows during ajax call
-    # Need to change row color after record is saved
     print("test")
 
     return json.dumps({'status': 'OK', 'data': request.args})
